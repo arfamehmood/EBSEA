@@ -1,0 +1,6 @@
+exportPattern("EBSEA","filterGenes","visualizeGenes","filterCounts")
+import(edgeR, limma, gtools)
+importFrom("graphics", "abline", "arrows", "barplot", "frame",
+             "legend", "par", "plot", "text", "title")
+importFrom("stats", "aggregate", "median", "model.matrix", "p.adjust",
+           "runif", "sd")
