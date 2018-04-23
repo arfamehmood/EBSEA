@@ -3,16 +3,14 @@
 \title{ Filter Count Data
 }
 \description{
-The exons are filtered based on their expression levels so that each exon has a
-cpm (count per million) of more than 1 in user defined percent of the samples.}
+The exons are filtered based on their expression levels so that each exon has a mean greater than 1 or user defined mean.}
 \usage{
-filterCounts(x, noOfSamples)
+filterCounts(x, mean)
 }
 \arguments{
 \item{x}{ A numeric dataframe of counts in the sample with gene and
 exon number as the row names and samples as the column names}
-\item{noOfSamples}{ Percentage of the number of samples
-that should have cpm greater than 1.}
+\item{mean}{ The mean value to filter the genes below the threshold}
 }
 
 \value{
@@ -21,6 +19,6 @@ that should have cpm greater than 1.}
 \seealso{\code{\link{EBSEA}}}
 \examples{
 data(origCounts)
-res <- filterCounts(origCounts, 20)
+res <- filterCounts(origCounts)
 }
 \keyword{ manip }
