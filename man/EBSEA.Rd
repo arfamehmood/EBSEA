@@ -11,15 +11,14 @@ It calculates fold changes, p-values and false discovery rate of the genes
 between the groups.
 }
 \usage{
-EBSEA(countData, group, paired = FALSE, effects = NULL, plot = FALSE)
+EBSEA(data, group, paired = FALSE, plot = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-\item{countData}{A dataframe of exon count data}
+\item{data}{A dataframe of exon count data}
 \item{group}{A vector indicating the sample groups in the experiment}
 \item{paired}{A logical indicating whether the samples are paired or unpaired.
 Default: FALSE}
-\item{effects}{A vector indicating the paired samples.}
 \item{plot}{A logical indicating whether a volcano plot is visualized.
 Default: FALSE}
 }
