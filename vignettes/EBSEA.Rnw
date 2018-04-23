@@ -106,12 +106,12 @@ The column names represent the following:
 \item  \textbf{P.Value:} p-value
 \end{itemize}
 
-The results can be viewed, stored or processed further. The result can be filtered for upregulated or downreglated genes by giving the fold changes and false discovery rate threshold values.\\[1em]
+The results can be viewed, stored or processed further.\\[1em]
 
 The user can visualize gene information by providing an identifier of the gene of interest:\\[1em]
 
 <<gene,fig=TRUE,width=10,height=10>>=
-visualizeGenes('FBgn0000064', group, origCounts, result)
+visualizeGenes('FBgn0000064', result)
 @
 
 \section{References}
