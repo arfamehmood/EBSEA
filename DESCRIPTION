@@ -1,13 +1,12 @@
 Package: EBSEA
 Type: Package
 Title: Exon Based Strategy for Expression Analysis of genes
-Version: 1.7.0
-Date: 2015-12-15
+Version: 1.7.1
+Date: 2016-12-12
 Author: Arfa Mehmood, Asta Laiho, Laura L. Elo
 Maintainer: Arfa Mehmood <arfa.mehmood@utu.fi>
-Description: Calculates differential expression of genes based on exon
-        counts of genes obtained from RNA-seq sequencing data.
+Description: Calculates differential expression of genes based on exon counts of
+    genes obtained from RNA-seq sequencing data.
 License: GPL-2
 biocViews: Software, DifferentialExpression, GeneExpression, Sequencing
-Imports: edgeR, limma, gtools, graphics, stats
-NeedsCompilation: no
+Imports: edgeR, limma, graphics, stats, plyr
