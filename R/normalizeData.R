@@ -1,8 +1,6 @@
-normalizeData <- function(x, group)
-{
-    message('Normalizing Data')
-    y <- DGEList(counts=x, group=group)
-    y <- calcNormFactors(y, method='TMM', na.rm=TRUE)
-    return(y)
-
+normalizeData <- function(x, group = NULL){
+  message('Normalizing Data')
+  norm.x <- DGEList(counts = x, group = group)
+  norm.x <- calcNormFactors(norm.x, method = 'TMM')
+  return(norm.x)
 }
