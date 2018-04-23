@@ -1,17 +1,14 @@
-filterCounts <- function(x, noOfSamples)
-{
-
-    if(ncol(x) == 0 | nrow(x) == 0)
-    {
-        stop('No count data found')
-    }
-    else
-    {
-        message(paste('Filtering genes having a cpm of more than 1 in atleast',
-                      noOfSamples, 'percent of the sample.'))
-        n <- round((ncol(x) * (100-noOfSamples))/100, digits=0)
-        isexpr <- rowSums(cpm(x) > 1) >= n
-        x <- x[isexpr, ]
-        return(x)
+filterCounts <- function(x, mean=1) {
+  if(ncol(x) == 0 | nrow(x) == 0) {
+    stop('No count data found')
+  } else {
+    message('Filtering genes having normalized mean less than 1')
+    normalize.count <- normalizeData(x)
+    counts <- t(apply(x, 1, function(y)
+    y*normalize.count$samples$norm.factors))
+    counts <- cbind(counts, 'rowMeans' = rowSums(counts)/ncol(counts))
+    counts <- cbind(x,counts)
+    counts <- counts[counts[, ncol(counts)] > mean, ]
+    return(x[,1:ncol(x)-1])
     }
 }
