@@ -1,73 +1,85 @@
 # function to perform Exon Based Strategy
-EBSEA <- function(countData, group, paired=FALSE, effects=NULL, plot=FALSE)
-{
-    message("Checking Parameters")
+EBSEA <- function(data, group, paired = FALSE, plot = FALSE) {
+  message("Checking Parameters")
+  # Checking the parameters
+  # Checking countData
+  if(is.null(data)) {
+    stop('No count data found..')
+  }
+  # Checking groups
+  f <- factor(group)
+  if(length(levels(f)) > 2) {
+    stop('EBS performs pairwise comparison')
+  }
+  if(length(levels(f)) == 1) {
+    stop('Please provide two groups')
+  }
+  if(length(levels(f)) == 0) {
+    stop('No group information provided')
+  }
+  # Normalization
 
-    # Checking the parameters
-    # Checking countData
-    if(is.null(countData)){stop('No count data found..')}
-    # Checking groups
-    f <- factor(group)
-    if(length(levels(f)) > 2){stop('EBS performs pairwise comparison')}
-    if(length(levels(f)) == 1){stop('Please provide two groups')}
-    if(length(levels(f)) == 0){stop('No group information provided')}
-    # Normalization
-    countData <- normalizeData(countData, group)
+  norm.data <- normalizeData(data, group)
 
-    # Designing Matrix
-    if(paired == FALSE)
-    {
-        design <- model.matrix(~0 + f)
-        colnames(design) <- levels(f)
+  # Designing Matrix
+  if(paired == FALSE) {
+    design <- model.matrix(~0 + f)
+    colnames(design) <- levels(f)
     }
-    if(paired == TRUE)
-    {
-        effects <- as.factor(effects)
-        design <- model.matrix(~0 + f + effects)
-        colnames(design) <- c(levels(f), levels(effects)[-1])
+  if(paired == TRUE) {
+    if(ncol(data) %% 2 != 0) {
+      stop('Uneven number of columns found')
     }
+    if(length(which(f == levels(f)[1])) != length(which(f == levels(f)[2]))) {
+      stop('Uneven samples in the data ....')
+    }
+    effects <- as.factor(rep(paste0('P', c(1:(ncol(data)/2))), 2))
+    design <- model.matrix(~0 + f + effects)
+    colnames(design) <- c(levels(f), levels(effects)[-1])
+  }
 
-    # Contrast matrix
-    contrast <- paste(levels(f)[1], '-', levels(f)[2], sep='')
-    contrast.matrix <- makeContrasts(contrasts=contrast, levels=design)
+  #Contrast matrix
+  contrast <- paste(levels(f)[1], '-', levels(f)[2], sep = '')
+  contrast.matrix <- makeContrasts(contrasts = contrast, levels = design)
 
-    message("Performing Statistical testing of Exons")
+  message("Performing Statistical testing of Exons")
 
-    # Statistical testing
-    v <- voom(countData, design, plot=FALSE)
-    fit <- lmFit(v, design)
-    fit2 <- contrasts.fit(fit, contrast.matrix)
-    fit3 <- eBayes(fit2)
-    ExonTable <- topTable(fit3, coef=1, adjust.method="fdr",
-                          number=nrow(countData$counts), sort.by="P")
-
-    ExonTable$ID <- rownames(ExonTable)
-    ExonTable <- ExonTable[, c("ID", "logFC", "P.Value", "adj.P.Val", "AveExpr")]
-
-    ExonTable <- data.frame(cbind("FC" = logratio2foldchange(ExonTable[["logFC"]]),
-                                  ExonTable))
-
-    # Generating Gene Statistics
-    GeneTable <- generateNullDistribution(findScore(ExonTable))
-    ExonTable <- ExonTable[, c(2, 6, 1, 3, 4, 5)]
-    colnames(ExonTable) <- c('GeneExon', 'AveExpr', 'FC', 'logFC',
+  # Statistical testing
+  voom.data <- voom(norm.data, design, plot = FALSE)
+  fit <- lmFit(voom.data, design)
+  fit2 <- contrasts.fit(fit, contrast.matrix)
+  fit3 <- eBayes(fit2)
+  exon.table <- topTable(fit3,
+                         coef = 1,
+                         adjust.method = "fdr",
+                         number = nrow(norm.data$counts),
+                         sort.by = "P")
+  exon.table$ID <- rownames(exon.table)
+  exon.table <- exon.table[, c("ID", "logFC", "P.Value", "adj.P.Val", "AveExpr")]
+  #exon.table <- data.frame(cbind("FC" = logratio2foldchange(exon.table[["logFC"]]),
+   #                              exon.table))
+  # Generating Gene Statistics
+  gene.table <- generateNullDistribution(findScore(exon.table))
+  exon.table <- exon.table[, c(1, 5, 2, 3, 4)]
+  colnames(exon.table) <- c('GeneExon', 'AveExpr', 'logFC',
                              'P.Value', 'FDR')
-    row.names(ExonTable) <- NULL
+  row.names(exon.table) <- NULL
 
+  result <- list("ExonTable" = exon.table,
+                 "GeneTable" = gene.table,
+                 "ExonCounts" = data,
+                 "NormData" = norm.data$samples)
 
-    result <- list("ExonTable" = ExonTable,
-                 "GeneTable" = GeneTable)
-
-    if(plot == TRUE)
-    {
-        with(result$GeneTable, plot(logFC, -log2(P.Value), pch=20,
-                                    main="Volcano plot"))
-        abline(v=c(1, -1), lty=3, lwd=1)
-    }
-
-    rm(ExonTable)
-    gc()
-    message('Done')
-    return(result)
-
+  tryCatch(if(plot == TRUE) {
+    with(result$GeneTable, plot(logFC, -log2(P.Value),
+        pch = 20, main = "Volcano plot"))
+    abline(v = c(1, -1), lty = 3, lwd = 1)
+  }, error = function(e){print(e)})
+  class(result) <- "EBSEA"
+  rm(exon.table)
+  rm(gene.table)
+  rm(norm.data)
+  gc()
+  message('Done')
+  return(result)
 }
