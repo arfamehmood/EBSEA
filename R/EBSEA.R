@@ -28,7 +28,7 @@ EBSEA <- function(data, group, paired = FALSE, plot = FALSE) {
     }
   if(paired == TRUE) {
     if(ncol(data) %% 2 != 0) {
-      stop('Uneven number of columns found')
+      stop('Uneven number of columns found ')
     }
     if(length(which(f == levels(f)[1])) != length(which(f == levels(f)[2]))) {
       stop('Uneven samples in the data ....')
