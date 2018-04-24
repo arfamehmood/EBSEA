@@ -53,7 +53,7 @@ visualizeGenes <- function(gene, ebsea.out) {
   par(fig = c(0, 1, 0, 0.7))
   add_legend("bottomright", legend = levels(group), fill = c("grey", "white"),
          horiz = TRUE, cex = 0.9, box.lty = 0)
-  par(fig = c(0, 1, 0.7, 0.97), new = TRUE, mar = c(0.5, 4, 2, 1))
+  par(fig = c(0, 1, 0.7, 0.98), new = TRUE, mar = c(0.5, 4, 2, 1))
   FDR <- c()
   for( i in 1 : nrow(gene.exons)) {
       if(gene.exons$P.Value[i] < 0.01) {
@@ -88,7 +88,7 @@ visualizeGenes <- function(gene, ebsea.out) {
                            gene.exons$logFC + 0.1),
             labels = FDR)
    gene <- strsplit(row.names(counts)[1], ':')[[1]][1]
-   par(fig = c(0, 1, 0.97, 1), new = TRUE)
+   par(fig = c(0, 1, 0.98, 1), new = TRUE)
    mtext(paste0(gene, ' (FDR:', round(gene.info$FDR, 5), ')'))
    par(fig = c(0, 1, 0, 1))
 }
