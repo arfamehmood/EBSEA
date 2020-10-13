@@ -1,0 +1,121 @@
+---
+title: "EBSEA: Exon Based Strategy for Expression Analysis of genes"
+author: "Arfa Mehmood"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{EBSEA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction 
+
+Conventionally, gene-level read counts are used as input to test for differential gene expression between sample condition groups. EBSEA follows a different approach: in order to increase the power it first performs the statistical testing separately for each exon prior to aggregating the results to the gene level. The user provides the raw exon count data, which can be generated, for instance, using the python scripts in the DEXSeq or RSubread R/Bioconductor packages.
+DESeq2 R/Bioconductor package is used for normalization (RLE method) and statistical testing. Exon-level results are aggregated to the gene level using empirical Brown’s method (ebm), taking the dependence of exons into consideration to avoid inflation of p-values. P-values are corrected using the Benjamini-Hochberg method. 
+
+
+## Data
+
+EBSEA takes the raw exon-level counts as input. Columns of the data frame contain the sample names and row names consist of the gene name followed by the exon number, separated by a colon: e.g. GeneName:ExonNumber.
+
+exonCounts provided with the package can be used for testing. It contains the first 1000 exon count rows from the pasilla dataset from Pasilla R/Bioconductor package. The dataset has seven samples belonging to either treated or untreated sample group. 
+
+The dataset can be taken into use as follows:
+
+
+
+```{r}
+library(EBSEA)
+data("exonCounts")
+head(exonCounts)
+```
+## Data Filtering
+
+It is recommended to filter out the lowly expressed exons prior to statistical testing. This can be performed using filterCount method that filters out the exons with average count across the sample set lower than the threshold (default 1). After filtering the individual exons, it is controlled that each gene has a required mimimum number of exons remaining (default 1) or otherwise the whole gene is filtered out.
+
+
+```{r}
+filtCounts <- filterCounts(exonCounts)
+```
+## Analysis
+
+To run EBSEA, sample group is defined for each column. It can also be separately indicated which samples of the two groups are paired. 
+
+```{r}
+group <- data.frame('group' = as.factor(c('G1', 'G1', 'G1', 'G2', 'G2', 'G2', 'G2')))
+row.names(group) <- colnames(filtCounts)
+design <- ~group
+ebsea.out <- EBSEA(filtCounts, group, design)
+```
+
+The paired analysis can be provided as follows:
+```{r}
+group <- data.frame('group' = as.factor(c('G1', 'G1', 'G1', 'G2', 'G2', 'G2', 'G2')), 'paired' = as.factor(c(1,2,3,1,2,3,3)))
+row.names(group) <- colnames(exonCounts)
+design <- ~paired+group
+ebsea.out <- EBSEA(exonCounts, group, design)
+```
+
+
+## Results
+
+The result list contains the following information:
+
+
+* ExonTable: Table of exon-level statistics
+* GeneTable: Table of gene-level statistics
+* RawCounts: Raw exon-level read counts
+* NormCounts: Normalized exon-level read counts
+* Group: Sample group for each sample
+* design: design matrix used
+
+
+The exon statistics are as follows:
+```{r}
+head(ebsea.out$ExonTable)
+```
+The result for each exon contains the following:
+
+* **baseMean:** mean expression level across the dataset
+* **log2FoldChange:** log2 fold-change
+* **lfcSE:** standard error of the log2 fold-change
+* **stat:** z-statistics
+* **pvalue:** p-values
+* **padj:** adjusted p-values
+* **gene_id:** Associated gene name
+
+The exon statistics are as follows:
+```{r}
+head(ebsea.out$GeneTable)
+```
+
+The column names represent the following:
+
+* **Gene:** gene name
+* **P_test:** p-value 
+* **padj:** adjusted p-value
+
+Result for a specific gene can be visualized as follows:
+
+
+```{r, fig.width = 6, fig.height= 6} 
+visualizeGenes('FBgn0000064', ebsea.out)
+```
+
+
+Top panel contains the log2 fold-change for each expressed exon. Asterisk denotes the significance level (\*: < 0.05, \**: < 0.01). Bottom panel shows the averaged normalized read count for each sample group. 
+
+The title of the figure shows the gene name and the adjusted gene-level p-value (fdr)
+
+
+## Reference
+Laiho, A. et al., **A note on an exon-based strategy to identify differentially expressed genes in RNA-seq experiments**. PloS One, 2014.
+

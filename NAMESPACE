@@ -1,6 +1,0 @@
-exportPattern("EBSEA","filterGenes","visualizeGenes","filterCounts")
-import(edgeR, limma, plyr)
-importFrom("graphics", "abline", "arrows", "barplot", "frame",
-             "legend", "par", "plot", "text", "title", "mtext", "hist")
-importFrom("stats", "aggregate", "median", "model.matrix", "p.adjust",
-           "runif", "sd")
