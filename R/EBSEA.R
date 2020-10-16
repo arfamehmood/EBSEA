@@ -67,10 +67,32 @@ EBSEA <- function(data, columnData, design, test = 'Wald', contrasts = NULL, plo
   } else{
     message('No test provided')
   }
+<<<<<<< HEAD
   if(is.null(contrasts)){
     exon.table <- as.data.frame(results(DESeqData))
   }else{
     exon.table <- as.data.frame(results(DESeqData, contrast = contrasts))
+=======
+  # Normalization
+
+  norm.data <- normalizeData(data, group)
+
+  # Designing Matrix
+  if(paired == FALSE) {
+    design <- model.matrix(~0 + f)
+    colnames(design) <- levels(f)
+    }
+  if(paired == TRUE) {
+    if(ncol(data) %% 2 != 0) {
+      stop('Uneven number of columns found ')
+    }
+    if(length(which(f == levels(f)[1])) != length(which(f == levels(f)[2]))) {
+      stop('Uneven samples in the data ....')
+    }
+    effects <- as.factor(rep(paste0('P', c(1:(ncol(data)/2))), 2))
+    design <- model.matrix(~0 + f + effects)
+    colnames(design) <- c(levels(f), levels(effects)[-1])
+>>>>>>> upstream/master
   }
   
   # Aggreagting to gene level results

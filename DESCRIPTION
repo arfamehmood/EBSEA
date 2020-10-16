@@ -1,7 +1,12 @@
 Package: EBSEA
 Type: Package
 Title: Exon Based Strategy for Expression Analysis of genes
+<<<<<<< HEAD
 Version: 1.17.1
+=======
+Version: 1.17.0
+Date: 2016-12-12
+>>>>>>> upstream/master
 Author: Arfa Mehmood, Asta Laiho, Laura L. Elo
 Maintainer: Arfa Mehmood <arfa.mehmood@utu.fi>
 Description: Calculates differential expression of genes based on exon counts of

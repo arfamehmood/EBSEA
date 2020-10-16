@@ -69,10 +69,15 @@ visualizeGenes <- function(gene, ebsea.out) {
          code = 3, length = 0.03)
   par(fig = c(0, 1, 0, 0.7))
   add_legend("bottomright", legend = levels(group), fill = c("grey", "white"),
+<<<<<<< HEAD
              horiz = TRUE, cex = 0.9, box.lty = 0)
   par(fig = c(0, 1, 0.725, 1.0), new = TRUE, mar = c(0.5, 4, 2, 1))
   
   # setting the arrows for the bars based on their p-values
+=======
+         horiz = TRUE, cex = 0.9, box.lty = 0)
+  par(fig = c(0, 1, 0.7, 0.98), new = TRUE, mar = c(0.5, 4, 2, 1))
+>>>>>>> upstream/master
   FDR <- c()
   for( i in seq(1, nrow(gene.exons))) {
     if(gene.exons$pvalue[i] <= 0.001) {
@@ -96,6 +101,7 @@ visualizeGenes <- function(gene, ebsea.out) {
   } else if(round(max(gene.exons$log2FoldChange)) == el){
     el <- el + 0.5
   }
+<<<<<<< HEAD
   b2 <- barplot(gene.exons$log2FoldChange, col = ifelse(gene.exons$log2FoldChange > 0, "red", "blue"),
                 ylab = 'Log2 FC',
                 ylim = c(sl, el))
@@ -108,6 +114,20 @@ visualizeGenes <- function(gene, ebsea.out) {
   gene <- strsplit(row.names(counts)[1], ':')[[1]][1]
   # mtext(paste0(gene, ' (FDR:', round(gene.info$padj, 3), ')'))
   mtext(paste0(gene, ' (FDR:', round(gene.info$padj, 3), ')'), line  = 0.5)
+=======
+  b2 <- barplot(gene.exons$logFC, col = ifelse(gene.exons$logFC > 0, "red", "blue"),
+                 ylab = 'Log FC',
+                 ylim = c(min.value, max.value))
+
+   text(b2, y = ifelse(gene.exons$logFC < 0,
+                           gene.exons$logFC - 0.1,
+                           gene.exons$logFC + 0.1),
+            labels = FDR)
+   gene <- strsplit(row.names(counts)[1], ':')[[1]][1]
+   par(fig = c(0, 1, 0.98, 1), new = TRUE)
+   mtext(paste0(gene, ' (FDR:', round(gene.info$FDR, 5), ')'))
+   par(fig = c(0, 1, 0, 1))
+>>>>>>> upstream/master
 }
 
 
